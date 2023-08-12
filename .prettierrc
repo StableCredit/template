@@ -1,16 +1,20 @@
 {
-  "arrowParens": "avoid",
-  "bracketSpacing": true,
-  "endOfLine":"auto",
-  "printWidth": 120,
-  "singleQuote": false,
+  "semi": false,
+  "trailingComma": "es5",
+  "printWidth": 100,
   "tabWidth": 2,
-  "trailingComma": "all",
+  "arrowParens": "always",
   "overrides": [
     {
       "files": "*.sol",
       "options": {
         "tabWidth": 4
+      }
+    },
+    {
+      "files": ["*.yml", "*.yaml"],
+      "options": {
+        "bracketSpacing": false
       }
     }
   ]

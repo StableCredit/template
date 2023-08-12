@@ -1,0 +1,6 @@
+ds-test/=lib/stable-credit/lib/forge-std/lib/ds-test/src/
+forge-std/=lib/stable-credit/lib/forge-std/src/
+@openzeppelin/contracts-upgradeable/=lib/stable-credit/lib/openzeppelin-contracts-upgradeable/contracts/
+@openzeppelin/contracts/=lib/stable-credit/lib/openzeppelin-contracts/contracts/
+@uniswap/v3-periphery/=lib/stable-credit/lib/v3-periphery/
+@stable-credit/contracts/=lib/stable-credit/contracts/

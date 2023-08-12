@@ -1,16 +1,32 @@
-node_modules
+**/node_modules
+artifacts*
+deployments/localhost
+cache*
+# testing
+coverage
+# production
+build
+# misc
+.DS_Store
+.env
+coverage.json
+types
+network_config.json
+.vscode
+cache/
+out/
+*.txt
+!remappings.txt
 
-#Hardhat files
-cache
-artifacts
-factories
-typechain
+lcov.info
 
-yarn.lock
+types
 
 .env
 
-typechain/*
+deployments/localhost
+deployments/ganache
+deployments/hardhat
 
-
-
+.openzeppelin/unknown-31337.json
+.openzeppelin/unknown-1337.json
