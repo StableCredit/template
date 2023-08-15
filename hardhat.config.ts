@@ -1,9 +1,18 @@
-import { HardhatUserConfig } from "hardhat/config";
+const fs = require("fs")
+import { HardhatUserConfig, task } from "hardhat/config";
 import { NetworkUserConfig } from "hardhat/types";
-import "@nomicfoundation/hardhat-toolbox";
-
 import { config as dotenvConfig } from "dotenv";
 import { resolve } from "path";
+import "hardhat-dependency-compiler"
+import "hardhat-preprocessor"
+import "hardhat-deploy"
+import 'hardhat-deploy-ethers';
+import "@typechain/hardhat"
+import "@nomicfoundation/hardhat-ethers"
+import "@openzeppelin/hardhat-upgrades"
+
+
+
 dotenvConfig({ path: resolve(__dirname, "./.env") });
 
 const chainIds = {
@@ -19,7 +28,6 @@ const chainIds = {
 const MNEMONIC = process.env.MNEMONIC || "";
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "";
 const INFURA_API_KEY = process.env.INFURA_API_KEY || "";
-const ALCHEMY_KEY = process.env.ALCHEMY_KEY || "";
 
 function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
   const url: string = "https://" + network + ".infura.io/v3/" + INFURA_API_KEY;
@@ -32,6 +40,7 @@ function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig 
     },
     chainId: chainIds[network],
     url,
+    saveDeployments: true,
   };
 }
 
@@ -46,6 +55,7 @@ const config: HardhatUserConfig = {
         mnemonic: MNEMONIC,
       },
       chainId: chainIds.hardhat,
+      saveDeployments: true,
     },
     mainnet: createTestnetConfig("mainnet"),
     goerli: createTestnetConfig("goerli"),
@@ -60,18 +70,54 @@ const config: HardhatUserConfig = {
       },
     ],
   },
-  etherscan: {
-    apiKey: ETHERSCAN_API_KEY,
-  },
-  gasReporter: {
-    currency: "USD",
-    gasPrice: 100,
-    enabled: process.env.REPORT_GAS == "true" ?? false,
-  },
   typechain: {
-    outDir: "typechain",
-    target: "ethers-v5",
+    outDir: "types",
+    target: "ethers-v6",
   },
+  paths: {
+    artifacts: "./artifacts",
+    cache: "./cache",
+    sources: "./contracts",
+    tests: "./test",
+    deployments: "./deployments",
+    deploy: "./deploy",
+    imports: "./artifacts",
+  },
+  dependencyCompiler: {
+    paths: [
+      "lib/stable-credit/contracts/Assurance/AssurancePool.sol",
+      "lib/stable-credit/contracts/Assurance/AssuranceOracle.sol",
+      "lib/stable-credit/lib/v3-periphery/contracts/interfaces/ISwapRouter.sol",
+      "lib/stable-credit/contracts/StableCredit/StableCredit.sol",
+      "lib/stable-credit/contracts/StableCredit/StableCreditRegistry.sol",
+      "lib/stable-credit/contracts/AccessManager.sol",
+      "lib/stable-credit/contracts/CreditIssuer.sol",
+      "lib/stable-credit/contracts/FeeManager.sol",
+    ],
+  },
+  preprocess: {
+    eachLine: (hre) => ({
+      transform: (line) => {
+        if (line.match(/^\s*import /i)) {
+          getRemappings().forEach(([find, replace]) => {
+            if (line.match(find)) {
+              line = line.replace(find, replace)
+            }
+          })
+        }
+        return line
+      },
+    }),
+  }
 };
 
+
 export default config;
+
+function getRemappings() {
+  return fs
+    .readFileSync("remappings.txt", "utf8")
+    .split("\n")
+    .filter(Boolean) // remove empty lines
+    .map((line) => line.trim().split("="))
+}
