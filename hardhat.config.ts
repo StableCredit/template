@@ -12,7 +12,6 @@ import "@nomicfoundation/hardhat-ethers"
 import "@openzeppelin/hardhat-upgrades"
 
 
-
 dotenvConfig({ path: resolve(__dirname, "./.env") });
 
 const chainIds = {
@@ -66,7 +65,7 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: "0.8.17",
+        version: "0.8.15",
       },
     ],
   },

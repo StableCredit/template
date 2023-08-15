@@ -1,6 +1,5 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types"
-import { retry } from "ts-retry"
-import { Deployment, DeploymentSubmission } from "hardhat-deploy/dist/types"
+import { DeploymentSubmission } from "hardhat-deploy/dist/types"
 import { DeployProxyOptions } from "@openzeppelin/hardhat-upgrades/dist/utils/options"
 import { ethers } from "ethers"
 
@@ -31,17 +30,18 @@ export const deployProxyAndSaveAs = async (
   let abi = (await hardhat.artifacts.readArtifact(name)).abi
 
   let contract = await hardhat.upgrades.deployProxy(contractFactory, args, deployOptions)
-  
+
   contract = await contract.waitForDeployment()
+
   let receipt = await contract.deploymentTransaction()
   let tx = await receipt?.getTransaction()
-  let contractAddress = await contract.getAddress()
-  if (!receipt || !tx || !contractAddress) return ""
-
-
+  let proxyAddress = await contract.getAddress()
+  const implAddress = await hardhat.upgrades.erc1967.getImplementationAddress(proxyAddress)
+  console.log(implAddress)
+  if (!receipt || !tx || !proxyAddress) return ""
 
   const contractDeployment = {
-    address: contractAddress,
+    address: proxyAddress,
     abi,
     receipt: {
       from: receipt.from,
@@ -52,12 +52,13 @@ export const deployProxyAndSaveAs = async (
       cumulativeGasUsed: 0,
       gasUsed: 0,
     },
+    metadata: "implementationAddress: " + implAddress,
   } as DeploymentSubmission
 
   await hardhat.deployments.save(name, contractDeployment)
 
-  console.log("🚀 ", name, " deployed at ", contractAddress)
-  return contractAddress
+  console.log("🚀 ", name, " deployed at ", proxyAddress)
+  return proxyAddress
 }
 
 export const formatStableCredits = (value: ethers.BigNumberish) => {
