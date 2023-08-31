@@ -1,18 +1,17 @@
 const fs = require("fs")
-import { HardhatUserConfig, task } from "hardhat/config";
-import { NetworkUserConfig } from "hardhat/types";
-import { config as dotenvConfig } from "dotenv";
-import { resolve } from "path";
+import { HardhatUserConfig, task } from "hardhat/config"
+import { NetworkUserConfig } from "hardhat/types"
+import { config as dotenvConfig } from "dotenv"
+import { resolve } from "path"
 import "hardhat-dependency-compiler"
 import "hardhat-preprocessor"
 import "hardhat-deploy"
-import 'hardhat-deploy-ethers';
+import "hardhat-deploy-ethers"
 import "@typechain/hardhat"
 import "@nomicfoundation/hardhat-ethers"
 import "@openzeppelin/hardhat-upgrades"
 
-
-dotenvConfig({ path: resolve(__dirname, "./.env") });
+dotenvConfig({ path: resolve(__dirname, "./.env") })
 
 const chainIds = {
   ganache: 1337,
@@ -22,14 +21,13 @@ const chainIds = {
   mainnet: 1,
   rinkeby: 4,
   ropsten: 3,
-};
+}
 
-const MNEMONIC = process.env.MNEMONIC || "";
-const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "";
-const INFURA_API_KEY = process.env.INFURA_API_KEY || "";
+const MNEMONIC = process.env.MNEMONIC || ""
+const INFURA_API_KEY = process.env.INFURA_API_KEY || ""
 
 function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
-  const url: string = "https://" + network + ".infura.io/v3/" + INFURA_API_KEY;
+  const url: string = "https://" + network + ".infura.io/v3/" + INFURA_API_KEY
   return {
     accounts: {
       count: 10,
@@ -40,7 +38,7 @@ function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig 
     chainId: chainIds[network],
     url,
     saveDeployments: true,
-  };
+  }
 }
 
 // You need to export an object to set up your config
@@ -107,11 +105,10 @@ const config: HardhatUserConfig = {
         return line
       },
     }),
-  }
-};
+  },
+}
 
-
-export default config;
+export default config
 
 function getRemappings() {
   return fs
